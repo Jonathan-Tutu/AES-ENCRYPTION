@@ -27,23 +27,8 @@ int main()
     AddRoundKey(input, CipherKey);
     printf("%d", memcmp(&input, &Response, 16));
     printf("\n");
-    SubBytes(input);
-    printf("\n");
-    for(int i = 0; i < 4; i++)
-    {
-       for(int j = 0; j < 4; j++)
-       {
-           printf("%02x", input[i][j]);
-       }
-    }
 
+    SubBytes(input);
     ShiftRows(input);
-    printf("\n");
-    for(int i = 0; i < 4; i++)
-    {
-       for(int j = 0; j < 4; j++)
-       {
-           printf("%02x", input[i][j]);
-       }
-    }
+    MixColumns(input);
 }

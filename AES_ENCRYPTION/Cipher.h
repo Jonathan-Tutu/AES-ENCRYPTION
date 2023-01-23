@@ -10,6 +10,6 @@ void Cipher(byte[4][4], byte[4][4], byte[4][4]);
 void AddRoundKey(byte[4][4], byte[4][4]);
 void SubBytes(byte[4][4]);
 void ShiftRows(byte[4][4]);
-void MixColumns();
+void MixColumns(byte[4][4]);
 
 #endif // CIPHER_H

@@ -55,41 +55,54 @@ void ShiftRows(byte in[4][4])
        byte temp;
 
         // Shift row 1 by 1
-        temp = in[1][0];
-        in[1][0] = in[1][1];
-        in[1][1] = in[2][1];
-        in[1][2] = in[3][1];
-        in[1][3] = temp;
+       temp = in[0][1];
+       in[0][1] = in[1][1];
+       in[1][1] =  in[2][1];
+       in[2][1] = in[3][1];
+       in[3][1] = temp;
 
-        printf("\n");
-        printf("%x", in[3][1]);
-        printf("\n");
-        for(int i = 0; i < 4; i++)
-        {
-            printf("%02x", in[1][i]);
-        }
 
-        /*
         // Shift row 2 by 2
-        temp = in[2][0];
-        in[2][0] = in[2][1];
-        in[2][1] = in[2][2];
-        in[2][2] = in[2][3];
-        in[2][3] = temp;
+       //Colonne //ligne
+        temp = in[0][2];
+        in[0][2] = in[1][2];
+        in[1][2] = in[2][2];
+        in[2][2] = in[3][2];
+        in[3][2] = temp;
 
-        temp = in[2][1];
-        in[2][0] = in[2][1];
-        in[2][1] = in[2][2];
-        in[2][2] = in[2][3];
-        in[2][3] = temp;
-
-
+        temp = in[0][2];
+        in[0][2] = in[1][2];
+        in[1][2] = in[2][2];
+        in[2][2] = in[3][2];
+        in[3][2] = temp;
 
         // Shift row 3 by 3
-        temp = in[3][0];
-        in[3][0] = in[3][3];
+        temp = in[3][3];
         in[3][3] = in[2][3];
-        in[3][2] = in[1][3];
-        in[3][1] = temp;
-        */
+        in[2][3] = in[1][3];
+        in[1][3] = in[0][3];
+        in[0][3] = temp;
+}
+
+void MixColumns(byte in[4][4])
+{
+      byte mask = 0x80;
+
+
+     byte test = in[0][0] ^ in[0][1];
+
+     byte pf = test&mask;
+
+     test  = test << 1;
+
+      if(pf == 0)
+      {
+            test ^= in[0][1];
+            test ^= in[0][2];
+            test ^= in[0][3];
+      }
+      else if(pf == 1)
+      {
+           test ^= 0x11b;
+      }
 }
