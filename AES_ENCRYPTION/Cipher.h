@@ -11,5 +11,7 @@ void AddRoundKey(byte[4][4], byte[4][4]);
 void SubBytes(byte[4][4]);
 void ShiftRows(byte[4][4]);
 void MixColumns(byte[4][4]);
+void keySchedule(byte in[4][4]);
+byte xTime(byte, byte);
 
 #endif // CIPHER_H

@@ -18,6 +18,19 @@ const byte sbox[16][16] = {
     {0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf},
     {0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16}};
 
+const byte rcon[4][10] = {
+    {0x01, 0x00, 0x00,  0x00},
+    {0x02, 0x00, 0x00,  0x00},
+    {0x04, 0x00, 0x00,  0x00},
+    {0x08, 0x00, 0x00,  0x00},
+    {0x10, 0x00, 0x00,  0x00},
+    {0x20, 0x00, 0x00,  0x00},
+    {0x40, 0x00, 0x00,  0x00},
+    {0x80, 0x00, 0x00,  0x00},
+    {0x1b, 0x00, 0x00,  0x00},
+    {0x36, 0x00, 0x00,  0x00},
+};
+
 
 void Cipher(byte in[4][4], byte out[4][4], byte word[4][4])
 {
@@ -61,7 +74,6 @@ void ShiftRows(byte in[4][4])
        in[2][1] = in[3][1];
        in[3][1] = temp;
 
-
         // Shift row 2 by 2
        //Colonne //ligne
         temp = in[0][2];
@@ -86,23 +98,104 @@ void ShiftRows(byte in[4][4])
 
 void MixColumns(byte in[4][4])
 {
-      byte mask = 0x80;
+     for(int i = 0; i < 4; i++)
+     {
+         byte S0 = in[i][0];
+         byte S1 = in[i][1];
+         byte S2 = in[i][2];
+         byte S3 = in[i][3];
+
+         in[i][0] = xTime(S0, S1) ^ S1 ^ S2 ^ S3;
+         in[i][1] = xTime(S1, S2) ^ S0 ^ S2 ^ S3;
+         in[i][2] = xTime(S2, S3) ^ S0 ^ S1 ^ S3;
+         in[i][3] = xTime(S3, S0) ^ S0 ^ S2 ^ S1;
+    }
+}
+
+byte xTime(byte byte1, byte byte2)
+{
+    byte calcul = byte1 ^ byte2;
+    byte mask = 0x80;
+    byte pf = calcul&mask; //On vérifie la valeur du bit de poids fort
+
+    if(pf == 0)
+    {
+          calcul  = calcul << 1;
+    }
+    else if(pf == 128)
+    {
+         calcul  = calcul << 1;
+         calcul ^= 0x1b;
+    }
+
+    return calcul;
+}
+
+void keySchedule(byte in[4][4]) //Cypherkey
+{
+    byte roundkey[4][40];
+    for(int var = 4; var <= 40; var+=4)
+    {
+        /* First col*/
+        byte Firstline[4];
+        byte LastLine[4];
+
+        for(int i = 0; i< 4; i++)
+        {
+            Firstline[i] = in[0][i];
+            LastLine[i] = in[3][i];
+
+        }
+
+        /*Rotate byte*/
+        byte temp = LastLine[0];
+        LastLine[0] = LastLine[1];
+        LastLine[1] = LastLine[2];
+        LastLine[2] = LastLine[3];
+        LastLine[3] = temp;
+
+        for(int i = 0; i < 4; i++)
+        {
+
+        }
+        /* SubBytes */
+        for(int i = 0; i < 4; i++)
+        {
+            int row = LastLine[i] >> 4;
+            int col = LastLine[i] & 0x0f;
+            LastLine[i] = sbox[row][col];
+        }
+
+        for(int i = 0; i < 4; i++)
+        {
+            roundkey[var][i] = in[0][i] ^ rcon[0][i] ^ LastLine[i];
+        }
+
+        for(int j = 1; j < 4; j++)
+        {
+            for(int i = 0; i < 4; i++)
+            {
+                roundkey[var+j][i] = in[j][i] ^ roundkey[var+j-1][i];
+                printf("%02x", roundkey[var+j][i]);
+            }
+        }
 
 
-     byte test = in[0][0] ^ in[0][1];
+        /*
+        for(int i = 0; i < 40; i++)
+        {
+            for(int j = 0; j < 4; j++)
+            {
 
-     byte pf = test&mask;
+            }
+        }*/
 
-     test  = test << 1;
+}
 
-      if(pf == 0)
-      {
-            test ^= in[0][1];
-            test ^= in[0][2];
-            test ^= in[0][3];
-      }
-      else if(pf == 1)
-      {
-           test ^= 0x11b;
-      }
+
+
+
+
+
+
 }
