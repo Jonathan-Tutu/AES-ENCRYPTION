@@ -18,7 +18,7 @@ const byte sbox[16][16] = {
     {0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf},
     {0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16}};
 
-const byte rcon[4][10] = {
+const byte rcon[10][4] = {
     {0x01, 0x00, 0x00,  0x00},
     {0x02, 0x00, 0x00,  0x00},
     {0x04, 0x00, 0x00,  0x00},
@@ -32,22 +32,42 @@ const byte rcon[4][10] = {
 };
 
 
-void Cipher(byte in[4][4], byte out[4][4], byte word[4][4])
+void Cipher(byte in[4][4], byte out[4][4], byte RoundKey[40][4])
 {
-    //AddRoundKey(in, word);
-}
+    AddRoundKey(in, RoundKey, 0);
 
-void AddRoundKey(byte in[4][4], byte word[4][4])
-{
+    for(int i = 1; i < 10; i++)
+    {
+        SubBytes(in);
+        ShiftRows(in);
+        MixColumns(in);
+        AddRoundKey(in, RoundKey, 4*i);
+     }
+
+    SubBytes(in);
+    ShiftRows(in);
+    AddRoundKey(in, RoundKey, 40);
+
+    printf("\n");
     for(int i = 0; i < 4; i++)
     {
         for(int j = 0; j < 4; j++)
         {
-
-            in[i][j] ^= word[i][j];
+            printf("%02x ", in[i][j]);
         }
     }
+}
 
+void AddRoundKey(byte in[4][4],  byte RoundKey[44][4], int val)
+{
+
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {
+            in[i][j] ^= RoundKey[i+val][j];
+        }
+    }
 }
 
 void SubBytes(byte in[4][4])
@@ -131,71 +151,59 @@ byte xTime(byte byte1, byte byte2)
     return calcul;
 }
 
-void keySchedule(byte in[4][4]) //Cypherkey
+void keySchedule(byte CypherKey[4][4], byte RoundKey[40][4], short Nk) //Cypherkey
 {
-    byte roundkey[4][40];
-    for(int var = 4; var <= 40; var+=4)
+     int rcon_index = 0;
+    /* Transfert CypherKey to RoundKey*/
+    for (int i = 0; i < Nk; i++)
     {
-        /* First col*/
-        byte Firstline[4];
-        byte LastLine[4];
-
-        for(int i = 0; i< 4; i++)
-        {
-            Firstline[i] = in[0][i];
-            LastLine[i] = in[3][i];
-
-        }
-
-        /*Rotate byte*/
-        byte temp = LastLine[0];
-        LastLine[0] = LastLine[1];
-        LastLine[1] = LastLine[2];
-        LastLine[2] = LastLine[3];
-        LastLine[3] = temp;
-
-        for(int i = 0; i < 4; i++)
-        {
-
-        }
-        /* SubBytes */
-        for(int i = 0; i < 4; i++)
-        {
-            int row = LastLine[i] >> 4;
-            int col = LastLine[i] & 0x0f;
-            LastLine[i] = sbox[row][col];
-        }
-
-        for(int i = 0; i < 4; i++)
-        {
-            roundkey[var][i] = in[0][i] ^ rcon[0][i] ^ LastLine[i];
-        }
-
-        for(int j = 1; j < 4; j++)
-        {
-            for(int i = 0; i < 4; i++)
+            for (int j = 0; j < Nk; j++)
             {
-                roundkey[var+j][i] = in[j][i] ^ roundkey[var+j-1][i];
-                printf("%02x", roundkey[var+j][i]);
+                RoundKey[i][j] = CypherKey[i][j];
             }
-        }
+    }
 
-
-        /*
-        for(int i = 0; i < 40; i++)
+    for(int i = Nk ; i < 44;  i++)
+    {
+        if(i % Nk  == 0)
         {
-            for(int j = 0; j < 4; j++)
+            /* Get Last cols*/
+            byte LastCol[4];
+            for(int j = 0 ; j < Nk; j++)
+             {
+                   LastCol[j] = RoundKey[i-1][j];
+
+             }
+
+            /*Rotate byte*/
+            byte temp = LastCol[0];
+            LastCol[0] = LastCol[1];
+            LastCol[1] = LastCol[2];
+            LastCol[2] = LastCol[3];
+            LastCol[3] = temp;
+
+            /* SubBytes */
+            for(int k = 0; k < Nk ; k++)
             {
+                int row = LastCol[k] >> 4;
+                int col = LastCol[k] & 0x0f;
+                LastCol[k] = sbox[row][col];
+             }
 
+            /*Calculation of first col*/
+            for(int l = 0; l < 4; l++)
+            {
+                RoundKey[i][l] = RoundKey[i-4][l] ^ rcon[rcon_index][l] ^ LastCol[l];
             }
-        }*/
+                rcon_index++;
+            }
+            else
+            {
+                    for(int m= 0; m < Nk; m++)
+                   {
+                        RoundKey[i][m] = RoundKey[i-1][m] ^ RoundKey[i-4][m];
+                   }
+            }
+       }
+   }
 
-}
-
-
-
-
-
-
-
-}
