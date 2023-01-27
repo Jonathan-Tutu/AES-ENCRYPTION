@@ -18,6 +18,24 @@ const byte sbox[16][16] = {
     {0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf},
     {0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16}};
 
+byte InvSbox[16][16] = {
+    {0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb},
+    {0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb},
+    {0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d, 0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e},
+    {0x08, 0x2e, 0xa1, 0x66, 0x28, 0xd9, 0x24, 0xb2, 0x76, 0x5b, 0xa2, 0x49, 0x6d, 0x8b, 0xd1, 0x25},
+    {0x72, 0xf8, 0xf6, 0x64, 0x86, 0x68, 0x98, 0x16, 0xd4, 0xa4, 0x5c, 0xcc, 0x5d, 0x65, 0xb6, 0x92},
+    {0x6c, 0x70, 0x48, 0x50, 0xfd, 0xed, 0xb9, 0xda, 0x5e, 0x15, 0x46, 0x57, 0xa7, 0x8d, 0x9d, 0x84},
+    {0x90, 0xd8, 0xab, 0x00, 0x8c, 0xbc, 0xd3, 0x0a, 0xf7, 0xe4, 0x58, 0x05, 0xb8, 0xb3, 0x45, 0x06},
+    {0xd0, 0x2c, 0x1e, 0x8f, 0xca, 0x3f, 0x0f, 0x02, 0xc1, 0xaf, 0xbd, 0x03, 0x01, 0x13, 0x8a, 0x6b},
+    {0x3a, 0x91, 0x11, 0x41, 0x4f, 0x67, 0xdc, 0xea, 0x97, 0xf2, 0xcf, 0xce, 0xf0, 0xb4, 0xe6, 0x73},
+    {0x96, 0xac, 0x74, 0x22, 0xe7, 0xad, 0x35, 0x85, 0xe2, 0xf9, 0x37, 0xe8, 0x1c, 0x75, 0xdf, 0x6e},
+    {0x47, 0xf1, 0x1a, 0x71, 0x1d, 0x29, 0xc5, 0x89, 0x6f, 0xb7, 0x62, 0x0e, 0xaa, 0x18, 0xbe, 0x1b},
+    {0xfc, 0x56, 0x3e, 0x4b, 0xc6, 0xd2, 0x79, 0x20, 0x9a, 0xdb, 0xc0, 0xfe, 0x78, 0xcd, 0x5a, 0xf4},
+    {0x1f, 0xdd, 0xa8, 0x33, 0x88, 0x07, 0xc7, 0x31, 0xb1, 0x12, 0x10, 0x59, 0x27, 0x80, 0xec, 0x5f},
+    {0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d, 0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef},
+    {0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61},
+    {0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x53, 0x21, 0x0c, 0x7d}};
+
 const byte rcon[10][4] = {
     {0x01, 0x00, 0x00,  0x00},
     {0x02, 0x00, 0x00,  0x00},
@@ -35,27 +53,33 @@ const byte rcon[10][4] = {
 void Cipher(byte in[4][4], byte out[4][4], byte RoundKey[40][4])
 {
     AddRoundKey(in, RoundKey, 0);
+    printOutput("Add roundKey : \n", in);
 
-    for(int i = 1; i < 10; i++)
+    for(int nbRound = 1; nbRound < 10; nbRound++)
     {
+        printf("\n\n");
+        printf("%s", "Round : ");
+        printf("%d", nbRound);
+
+
         SubBytes(in);
+        printOutput("Après SubBytes : \n", in);
         ShiftRows(in);
+        printOutput("Après ShiftRows : \n", in);
         MixColumns(in);
-        AddRoundKey(in, RoundKey, 4*i);
+        printOutput("Après MixColumns : \n", in);
+        AddRoundKey(in, RoundKey, 4*nbRound);
+        printOutput("Après AddRoundKey : \n", in);
      }
 
-    SubBytes(in);
-    ShiftRows(in);
-    AddRoundKey(in, RoundKey, 40);
-
     printf("\n");
-    for(int i = 0; i < 4; i++)
-    {
-        for(int j = 0; j < 4; j++)
-        {
-            printf("%02x ", in[i][j]);
-        }
-    }
+    printf("%s", "Fin des 9 rounds");
+    SubBytes(in);
+    printOutput("Après SubBytes : \n", in);
+    ShiftRows(in);
+    printOutput("Après ShiftRows : \n", in);
+    AddRoundKey(in, RoundKey, 40);
+    printOutput("Résultat final:\n", in);
 }
 
 void AddRoundKey(byte in[4][4],  byte RoundKey[44][4], int val)
@@ -79,6 +103,19 @@ void SubBytes(byte in[4][4])
             int row = in[i][j] >> 4;
             int col = in[i][j] & 0x0f;
             in[i][j] = sbox[row][col];
+        }
+    }
+}
+
+void InvSubBytes(byte in[4][4])
+{
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {
+            int row = in[i][j] >> 4;
+            int col = in[i][j] & 0x0f;
+            in[i][j] = InvSbox[row][col];
         }
     }
 }
@@ -116,6 +153,38 @@ void ShiftRows(byte in[4][4])
         in[0][3] = temp;
 }
 
+void InvShiftRows(byte in[4][4]) {
+    byte temp;
+
+    //Inverse row 1
+    temp = in[3][1];
+    in[3][1] = in[2][1];
+    in[2][1] = in[1][1];
+    in[1][1] = in[0][1];
+    in[0][1] = temp;
+
+    //Inverse row 2
+    temp = in[3][2];
+    in[3][2] = in[2][2];
+    in[2][2] = in[1][2];
+    in[1][2] = in[0][2];
+    in[0][2] = temp;
+
+    temp = in[3][2];
+    in[3][2] = in[2][2];
+    in[2][2] = in[1][2];
+    in[1][2] = in[0][2];
+    in[0][2] = temp;
+
+    //Inverse row 3
+    temp = in[0][3];
+    in[0][3] = in[1][3];
+    in[1][3] = in[2][3];
+    in[2][3] = in[3][3];
+    in[3][3] = temp;
+}
+
+
 void MixColumns(byte in[4][4])
 {
      for(int i = 0; i < 4; i++)
@@ -125,14 +194,31 @@ void MixColumns(byte in[4][4])
          byte S2 = in[i][2];
          byte S3 = in[i][3];
 
-         in[i][0] = xTime(S0, S1) ^ S1 ^ S2 ^ S3;
-         in[i][1] = xTime(S1, S2) ^ S0 ^ S2 ^ S3;
-         in[i][2] = xTime(S2, S3) ^ S0 ^ S1 ^ S3;
-         in[i][3] = xTime(S3, S0) ^ S0 ^ S2 ^ S1;
+         in[i][0] = xTime_2(S0, S1) ^ S1 ^ S2 ^ S3;
+         in[i][1] = xTime_2(S1, S2) ^ S0 ^ S2 ^ S3;
+         in[i][2] = xTime_2(S2, S3) ^ S0 ^ S1 ^ S3;
+         in[i][3] = xTime_2(S3, S0) ^ S0 ^ S2 ^ S1;
     }
 }
 
-byte xTime(byte byte1, byte byte2)
+void InvMixColumn(byte in[4][4])
+{
+    for(int i = 0; i < 4; i++)
+    {
+        byte S0 = in[i][0];
+        byte S1 = in[i][1];
+        byte S2 = in[i][2];
+        byte S3 = in[i][3];
+
+        in[i][0] = xTime_8(S0, S1, S2, S3) ^ xTime_4(S0, S2) ^ xTime_2(S0, S1) ^S1 ^ S2 ^ S3;
+        in[i][1] = xTime_8(S0, S1, S2, S3) ^ xTime_4(S1, S3) ^ xTime_2(S1, S2) ^S1 ^ S2 ^ S3;
+        in[i][2] = xTime_8(S0, S1, S2, S3) ^ xTime_4(S2, S0) ^ xTime_2(S2, S3) ^S1 ^ S2 ^ S3;
+        in[i][3] = xTime_8(S0, S1, S2, S3) ^ xTime_4(S3, S1) ^ xTime_2(S3, S0) ^S1 ^ S2 ^ S3;
+   }
+}
+
+
+byte xTime_2(byte byte1, byte byte2)
 {
     byte calcul = byte1 ^ byte2;
     byte mask = 0x80;
@@ -151,9 +237,58 @@ byte xTime(byte byte1, byte byte2)
     return calcul;
 }
 
+byte xTime_8(byte byte1, byte byte2,byte byte3,byte byte4)
+{
+    byte calcul = byte1 ^ byte2 ^ byte3 ^ byte4;
+    byte mask = 0x80;
+
+    for(int i = 0; i < 3; i++)
+    {
+        byte pf = calcul&mask; //On vérifie la valeur du bit de poids fort
+        if(pf == 0)
+        {
+              calcul  = calcul << 1;
+        }
+        else if(pf == 128)
+        {
+             calcul  = calcul << 1;
+             calcul ^= 0x1b;
+        }
+    }
+
+    return calcul;
+}
+
+byte InvxTime_4(byte byte1, byte byte2)
+{
+    byte calcul = byte1 ^ byte2;
+    byte mask = 0x80;
+
+    for(int i = 0; i < 2; i++)
+    {
+        byte pf = calcul&mask; //On vérifie la valeur du bit de poids fort
+        if(pf == 0)
+        {
+              calcul  = calcul << 1;
+        }
+        else if(pf == 128)
+        {
+             calcul  = calcul << 1;
+             calcul ^= 0x1b;
+        }
+    }
+
+    return calcul;
+}
+
+
+
 void keySchedule(byte CypherKey[4][4], byte RoundKey[40][4], short Nk) //Cypherkey
 {
+     int Nb = 4;
+     int Nr = 10;
      int rcon_index = 0;
+
     /* Transfert CypherKey to RoundKey*/
     for (int i = 0; i < Nk; i++)
     {
@@ -163,47 +298,66 @@ void keySchedule(byte CypherKey[4][4], byte RoundKey[40][4], short Nk) //Cypherk
             }
     }
 
-    for(int i = Nk ; i < 44;  i++)
+for(int i = Nk ; i < Nb * (Nr+1);  i++)
+{
+    if(i % Nk  == 0)
     {
-        if(i % Nk  == 0)
+        /* Get Last cols*/
+        byte temp[4];
+        for(int j = 0 ; j < Nk; j++)
         {
-            /* Get Last cols*/
-            byte LastCol[4];
-            for(int j = 0 ; j < Nk; j++)
-             {
-                   LastCol[j] = RoundKey[i-1][j];
+               temp[j] = RoundKey[i-1][j];
 
-             }
+        }
 
-            /*Rotate byte*/
-            byte temp = LastCol[0];
-            LastCol[0] = LastCol[1];
-            LastCol[1] = LastCol[2];
-            LastCol[2] = LastCol[3];
-            LastCol[3] = temp;
+        /*Rotate byte of the last Column*/
+        byte tempo = temp[0];
+        temp[0] = temp[1];
+        temp[1] = temp[2];
+        temp[2] = temp[3];
+        temp[3] = tempo;
 
-            /* SubBytes */
-            for(int k = 0; k < Nk ; k++)
+        /* SubBytes */
+        for(int k = 0; k < Nk ; k++)
+        {
+            int row = temp[k] >> 4;
+            int col = temp[k] & 0x0f;
+            temp[k] = sbox[row][col];
+         }
+
+        /*Calculation of first col*/
+        for(int rows = 0; rows < Nk; rows++)
+        {
+            RoundKey[i][rows] = RoundKey[i-4][rows] ^ rcon[rcon_index][rows] ^ temp[rows];
+        }
+            rcon_index++;
+        }
+        else
+        {
+                for(int rows=0; rows < Nk; rows++)
             {
-                int row = LastCol[k] >> 4;
-                int col = LastCol[k] & 0x0f;
-                LastCol[k] = sbox[row][col];
-             }
+                    RoundKey[i][rows] = RoundKey[i-1][rows] ^ RoundKey[i-4][rows];
+            }
+        }
+    }
+}
 
-            /*Calculation of first col*/
-            for(int l = 0; l < 4; l++)
-            {
-                RoundKey[i][l] = RoundKey[i-4][l] ^ rcon[rcon_index][l] ^ LastCol[l];
-            }
-                rcon_index++;
-            }
-            else
-            {
-                    for(int m= 0; m < Nk; m++)
-                   {
-                        RoundKey[i][m] = RoundKey[i-1][m] ^ RoundKey[i-4][m];
-                   }
-            }
-       }
-   }
+
+void printOutput(char message[15], byte in[4][4])
+{
+    printf("\n");
+    printf("%s", message);
+    for(int i = 0; i < 4; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {
+            printf("%02x ", in[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+
+
+
 
