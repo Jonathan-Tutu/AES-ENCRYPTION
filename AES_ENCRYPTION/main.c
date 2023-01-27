@@ -28,7 +28,7 @@ int main()
 
     keySchedule(CipherKey, RoundKey, 4);
 
-    Cipher(input, output, RoundKey);
+    //Cipher(input, output, RoundKey);
 
     InvCipher(ByteDecipher, output, RoundKey);
 }

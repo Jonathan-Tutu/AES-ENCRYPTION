@@ -52,12 +52,10 @@ const byte rcon[10][4] = {
 
 void InvCipher(byte in[4][4], byte out[4][4], byte RoundKey[40][4])
 {
-    byte round = 10;
-
     AddRoundKey(in, RoundKey, 40);
     printOutput("Add roundKey : \n", in);
 
-    for(round = 9; round > 0; round--)
+    for(int nbRound = 9; nbRound > 0; nbRound--)
     {
         printf("\n\n");
         printf("%s", "Round : ");
@@ -68,8 +66,8 @@ void InvCipher(byte in[4][4], byte out[4][4], byte RoundKey[40][4])
         InvSubBytes(in);
         printOutput("Après SubBytes : \n", in);
         AddRoundKey(in, RoundKey, 4*nbRound);
-        printOutput("Après AddRoundKey : \n", in);
-        InvMixColumns(in);
+        printOutput("Aprèhgfs AddRoundKey : \n", in);
+        InvMixColumn(in);
         printOutput("Après MixColumns : \n", in);
     }
 
@@ -80,7 +78,7 @@ void InvCipher(byte in[4][4], byte out[4][4], byte RoundKey[40][4])
     printOutput("Après ShiftRows : \n", in);
     InvSubBytes(in);
     printOutput("Après SubBytes : \n", in);
-    AddRoundKey(in, roundKey);
+    AddRoundKey(in, RoundKey, 0);
     printOutput("Résultat final:\n", in);
 }
 
@@ -294,7 +292,7 @@ byte xTime_8(byte byte1, byte byte2,byte byte3,byte byte4)
     return calcul;
 }
 
-byte InvxTime_4(byte byte1, byte byte2)
+byte xTime_4(byte byte1, byte byte2)
 {
     byte calcul = byte1 ^ byte2;
     byte mask = 0x80;
