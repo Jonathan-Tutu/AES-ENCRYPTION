@@ -7,6 +7,7 @@
 typedef uint8_t byte;
 
 void Cipher(byte[4][4], byte[4][4], byte[4][4]);
+InvCipher(byte[4][4], byte[4][4], byte[4][4]);
 void AddRoundKey(byte[4][4], byte[44][4], int);
 void SubBytes(byte[4][4]);
 void InvSubBytes(byte[4][4]);

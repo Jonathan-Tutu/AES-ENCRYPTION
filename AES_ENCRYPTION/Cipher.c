@@ -50,6 +50,41 @@ const byte rcon[10][4] = {
 };
 
 
+void InvCipher(byte in[4][4], byte out[4][4], byte RoundKey[40][4])
+{
+    byte round = 10;
+
+    AddRoundKey(in, RoundKey, 40);
+    printOutput("Add roundKey : \n", in);
+
+    for(round = 9; round > 0; round--)
+    {
+        printf("\n\n");
+        printf("%s", "Round : ");
+        printf("%d", nbRound);
+
+        InvShiftRows(in);
+        printOutput("Après ShiftRows : \n", in);
+        InvSubBytes(in);
+        printOutput("Après SubBytes : \n", in);
+        AddRoundKey(in, RoundKey, 4*nbRound);
+        printOutput("Après AddRoundKey : \n", in);
+        InvMixColumns(in);
+        printOutput("Après MixColumns : \n", in);
+    }
+
+    printf("\n");
+    printf("%s", "Fin des 9 rounds");
+
+    InvShiftRows(in);
+    printOutput("Après ShiftRows : \n", in);
+    InvSubBytes(in);
+    printOutput("Après SubBytes : \n", in);
+    AddRoundKey(in, roundKey);
+    printOutput("Résultat final:\n", in);
+}
+
+
 void Cipher(byte in[4][4], byte out[4][4], byte RoundKey[40][4])
 {
     AddRoundKey(in, RoundKey, 0);
