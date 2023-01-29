@@ -8,4 +8,5 @@ SOURCES += \
         main.c
 
 HEADERS += \
-    Cipher.h
+    Cipher.h \
+    Matrix.h
