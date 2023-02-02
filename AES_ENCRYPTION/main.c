@@ -24,7 +24,7 @@ int main()
     };
 
     //Generate roundkey
-    keySchedule(CipherKey, RoundKey, 4);
+    keySchedule(CipherKey, RoundKey);
 
     //Encryption of input
     Cipher(input, outputCipher, RoundKey);

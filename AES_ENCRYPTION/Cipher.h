@@ -5,7 +5,7 @@
 
 #include "Matrix.h"
 
-void keySchedule(byte[4][4], byte[4][44], short);
+void keySchedule(byte[4][4], byte[4][44]);
 
 void Cipher(byte[4][4], byte[4][4], byte[4][44]);
 void InvCipher(byte[4][4], byte[4][4], byte[4][44]);
